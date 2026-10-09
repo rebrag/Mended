@@ -1,0 +1,9 @@
+.next
+.next-*
+.data
+drizzle
+node_modules
+package-lock.json
+playwright-report
+test-results
+e2e/.screenshots

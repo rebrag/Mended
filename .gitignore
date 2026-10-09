@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local data (pglite database, uploaded photos)
+/.data/
+
+# playwright
+/test-results/
+/playwright-report/
+/e2e/.screenshots/
+
+!.env.example

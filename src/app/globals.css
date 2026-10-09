@@ -1,26 +1,256 @@
 @import "tailwindcss";
 
+/* Jerusalem limestone, tekhelet blue, olive, pomegranate, and gold. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  color-scheme: light;
+  --bg: #f8f2e7;
+  --bg-deep: #efe5d3;
+  --surface: #fffaf1;
+  --surface-raised: #ffffff;
+  --line: #e3d5bd;
+  --line-strong: #cdb894;
+  --ink: #3a2e25;
+  --ink-soft: #6b5a49;
+  --ink-faint: #998770;
+  --primary: #1f3a5f;
+  --primary-hover: #2a4b78;
+  --primary-ink: #fbf6ec;
+  --gold: #b9862c;
+  --gold-bright: #e4b450;
+  --gold-soft: #f3e2b8;
+  --clay: #b6643c;
+  --clay-dark: #874427;
+  --clay-light: #d58b5d;
+  --olive: #66753a;
+  --olive-dark: #46522a;
+  --pomegranate: #a3283a;
+  --pomegranate-light: #c94a58;
+  --wall: #ead9bb;
+  --wall-shade: #dcc6a0;
+  --mortar: #cbb48c;
+  --floor: #d8c29c;
+  --floor-shade: #c5ab80;
+  --wood: #8a5a36;
+  --wood-dark: #5f3c22;
+  --door: #2c5a8c;
+  --door-dark: #1f4570;
+  --danger: #a3283a;
+  --success: #4f6b2c;
+  --shadow: 0 1px 2px rgb(58 46 37 / 0.06), 0 6px 20px rgb(58 46 37 / 0.08);
+  --shadow-lg: 0 2px 4px rgb(58 46 37 / 0.06), 0 16px 40px rgb(58 46 37 / 0.14);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #15120e;
+    --bg-deep: #0f0d0a;
+    --surface: #211c16;
+    --surface-raised: #2a241c;
+    --line: #3a3127;
+    --line-strong: #54473a;
+    --ink: #f2e9da;
+    --ink-soft: #c4b39b;
+    --ink-faint: #8f7f6b;
+    --primary: #9dbbe2;
+    --primary-hover: #b5cdec;
+    --primary-ink: #13202f;
+    --gold: #e0b04f;
+    --gold-bright: #ffd27a;
+    --gold-soft: #3d3220;
+    --clay: #b3633b;
+    --clay-dark: #7c3e24;
+    --clay-light: #cf8659;
+    --olive: #8e9f58;
+    --olive-dark: #5d6b33;
+    --pomegranate: #d0495a;
+    --pomegranate-light: #e2707d;
+    --wall: #3a3226;
+    --wall-shade: #31291f;
+    --mortar: #2a231b;
+    --floor: #2c251d;
+    --floor-shade: #241e17;
+    --wood: #6b4529;
+    --wood-dark: #4a2f1b;
+    --door: #284f7c;
+    --door-dark: #1c3b60;
+    --danger: #e2707d;
+    --success: #9fbb6a;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 20px rgb(0 0 0 / 0.3);
+    --shadow-lg: 0 2px 4px rgb(0 0 0 / 0.3), 0 16px 40px rgb(0 0 0 / 0.45);
   }
 }
 
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #15120e;
+  --bg-deep: #0f0d0a;
+  --surface: #211c16;
+  --surface-raised: #2a241c;
+  --line: #3a3127;
+  --line-strong: #54473a;
+  --ink: #f2e9da;
+  --ink-soft: #c4b39b;
+  --ink-faint: #8f7f6b;
+  --primary: #9dbbe2;
+  --primary-hover: #b5cdec;
+  --primary-ink: #13202f;
+  --gold: #e0b04f;
+  --gold-bright: #ffd27a;
+  --gold-soft: #3d3220;
+  --clay: #b3633b;
+  --clay-dark: #7c3e24;
+  --clay-light: #cf8659;
+  --olive: #8e9f58;
+  --olive-dark: #5d6b33;
+  --pomegranate: #d0495a;
+  --pomegranate-light: #e2707d;
+  --wall: #3a3226;
+  --wall-shade: #31291f;
+  --mortar: #2a231b;
+  --floor: #2c251d;
+  --floor-shade: #241e17;
+  --wood: #6b4529;
+  --wood-dark: #4a2f1b;
+  --door: #284f7c;
+  --door-dark: #1c3b60;
+  --danger: #e2707d;
+  --success: #9fbb6a;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 20px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 2px 4px rgb(0 0 0 / 0.3), 0 16px 40px rgb(0 0 0 / 0.45);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-deep: var(--bg-deep);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-ink: var(--primary-ink);
+  --color-gold: var(--gold);
+  --color-gold-bright: var(--gold-bright);
+  --color-gold-soft: var(--gold-soft);
+  --color-clay: var(--clay);
+  --color-olive: var(--olive);
+  --color-pomegranate: var(--pomegranate);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --font-serif: var(--font-display);
+  --font-sans: var(--font-body);
+  --shadow-card: var(--shadow);
+  --shadow-lift: var(--shadow-lg);
+}
+
+html {
+  background: var(--bg);
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--gold-soft);
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    transform: scale(1, 1) translateY(0);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(0.96, 1.04) translateY(-0.3px);
+    opacity: 0.94;
+  }
+  50% {
+    transform: scale(1.03, 0.97) translateY(0.2px);
+    opacity: 0.98;
+  }
+  75% {
+    transform: scale(0.98, 1.02) translateY(-0.2px);
+    opacity: 0.92;
+  }
+}
+
+.flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: flicker 2.4s ease-in-out infinite;
+}
+
+.flame-b {
+  animation-duration: 2.9s;
+  animation-delay: -0.7s;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.glow-breathe {
+  animation: breathe 5s ease-in-out infinite;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rise-in {
+  animation: rise-in 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-deep) 25%, var(--line) 50%, var(--bg-deep) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+  border-radius: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flame,
+  .glow-breathe,
+  .rise-in,
+  .skeleton {
+    animation: none;
+  }
 }

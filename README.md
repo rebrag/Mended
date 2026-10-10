@@ -85,7 +85,7 @@ They return 404 when `TEST_MODE` is unset, and are always disabled on Vercel pro
 1. On [Vercel](https://vercel.com), import the GitHub repository.
 2. In the Vercel project, open **Storage** and create and connect:
    - a **Neon** Postgres database (this sets `DATABASE_URL`), and
-   - a **Blob** store (this sets `BLOB_READ_WRITE_TOKEN`).
+   - a **Blob** store with **Private** access (this sets `BLOB_STORE_ID`).
 3. Turn on 2-Step Verification for your Google account if it isn't already, then create an app password at https://myaccount.google.com/apppasswords.
 4. Generate push notification keys:
 

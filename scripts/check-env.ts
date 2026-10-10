@@ -16,8 +16,8 @@ function main() {
       fix: "Vercel project > Storage > Create Database > Neon, then connect it to this project.",
     },
     {
-      ok: Boolean(env.BLOB_READ_WRITE_TOKEN),
-      problem: "No photo storage is connected (BLOB_READ_WRITE_TOKEN).",
+      ok: Boolean(env.BLOB_READ_WRITE_TOKEN || env.BLOB_STORE_ID),
+      problem: "No photo storage is connected (BLOB_STORE_ID or BLOB_READ_WRITE_TOKEN).",
       fix: "Vercel project > Storage > Create > Blob, then connect it to this project.",
     },
     {

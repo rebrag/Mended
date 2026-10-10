@@ -27,6 +27,7 @@ export default defineConfig({
       MAIL_TRANSPORT: "outbox",
       TEST_MODE: "1",
       BLOB_READ_WRITE_TOKEN: "",
+      BLOB_STORE_ID: "",
       NEXT_PUBLIC_VAPID_PUBLIC_KEY: "",
       VAPID_PRIVATE_KEY: "",
     },

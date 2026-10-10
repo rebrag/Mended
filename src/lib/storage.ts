@@ -10,10 +10,14 @@ import path from "node:path";
  */
 const LOCAL_ROOT = path.join(process.cwd(), ".data", "uploads");
 
+/**
+ * A connected Vercel Blob store provides either a static token or, for newer stores, a store id that the
+ * SDK pairs with Vercel's automatic OIDC token.
+ */
 function blobConfigured(): boolean {
-  if (process.env.BLOB_READ_WRITE_TOKEN) return true;
+  if (process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID) return true;
   // Vercel's file system is read-only and temporary, so local disk is never an option there.
-  if (process.env.VERCEL) throw new Error("BLOB_READ_WRITE_TOKEN is not set. Connect a Blob store under Storage.");
+  if (process.env.VERCEL) throw new Error("No Blob store is connected. Connect one under Storage.");
   return false;
 }
 

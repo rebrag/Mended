@@ -11,7 +11,10 @@ import path from "node:path";
 const LOCAL_ROOT = path.join(process.cwd(), ".data", "uploads");
 
 function blobConfigured(): boolean {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+  if (process.env.BLOB_READ_WRITE_TOKEN) return true;
+  // Vercel's file system is read-only and temporary, so local disk is never an option there.
+  if (process.env.VERCEL) throw new Error("BLOB_READ_WRITE_TOKEN is not set. Connect a Blob store under Storage.");
+  return false;
 }
 
 function localPath(key: string): string {

@@ -82,37 +82,38 @@ They return 404 when `TEST_MODE` is unset, and are always disabled on Vercel pro
 
 ## Deploy (about 20 minutes, all free tiers)
 
-1. Push this repository to GitHub.
-2. On [Vercel](https://vercel.com), import the repository.
-3. In the Vercel project, open **Storage** and add:
-   - a **Neon Postgres** database (this sets `DATABASE_URL`), and
+1. On [Vercel](https://vercel.com), import the GitHub repository.
+2. In the Vercel project, open **Storage** and create and connect:
+   - a **Neon** Postgres database (this sets `DATABASE_URL`), and
    - a **Blob** store (this sets `BLOB_READ_WRITE_TOKEN`).
-4. On [Resend](https://resend.com), verify a domain you own and create an API key.
-5. Generate push notification keys:
+3. Turn on 2-Step Verification for your Google account if it isn't already, then create an app password at https://myaccount.google.com/apppasswords.
+4. Generate push notification keys:
 
    ```bash
    npx web-push generate-vapid-keys
    ```
 
-6. Add these environment variables in Vercel (Production):
+5. Add these in **Settings > Environment Variables**:
 
-   | Name                           | Value                                                   |
-   | ------------------------------ | ------------------------------------------------------- |
-   | `APP_URL`                      | Your site URL, for example `https://mended.example.com` |
-   | `MAIL_TRANSPORT`               | `resend`                                                |
-   | `RESEND_API_KEY`               | From Resend                                             |
-   | `MAIL_FROM`                    | `Mended <hello@your-domain.com>`                        |
-   | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Public key from step 5                                  |
-   | `VAPID_PRIVATE_KEY`            | Private key from step 5                                 |
-   | `VAPID_SUBJECT`                | `mailto:you@your-domain.com`                            |
+   | Name                           | Value                        |
+   | ------------------------------ | ---------------------------- |
+   | `MAIL_TRANSPORT`               | `gmail`                      |
+   | `GMAIL_USER`                   | Your Gmail address           |
+   | `GMAIL_APP_PASSWORD`           | The app password from step 3 |
+   | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Public key from step 4       |
+   | `VAPID_PRIVATE_KEY`            | Private key from step 4      |
+   | `VAPID_SUBJECT`                | `mailto:` plus your Gmail    |
 
+   Links in emails use the project's production domain automatically; set `APP_URL` only if you add a custom domain.
    Leave `TEST_MODE` unset.
 
-7. Deploy.
-   The `vercel-build` script runs database migrations before every build.
-8. Sign in, set up your home, and play one full round with a second account on two real phones before sending the invite.
+6. Redeploy (**Deployments > ... > Redeploy**).
+   Every build first checks that these settings exist and prints what's missing, then applies database migrations.
+7. Sign in, set up your home, and play one full round with a second account on two real phones before sending the invite.
 
 On iPhone, notifications only work after adding the site to the home screen (Share, then Add to Home Screen) and opening it from there.
+
+To send from your own domain instead of Gmail, set `MAIL_TRANSPORT=resend` with `RESEND_API_KEY` and `MAIL_FROM` from a domain verified in [Resend](https://resend.com).
 
 ## Project layout
 

@@ -2,11 +2,14 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Courtyard } from "@/components/courtyard";
 import { SettingsLink } from "@/components/page-header";
+import { PieceTracker } from "@/components/piece-tracker";
 import { ButtonLink, Card, Eyebrow } from "@/components/ui";
 import { db } from "@/db";
 import { getNow } from "@/lib/clock";
 import { isPaired, memberIds, requireHome, type HomeViewer } from "@/lib/dal";
+import { getLastMendedMoment, type LastMended } from "@/lib/game/history";
 import { loadHomeState, type HomeState } from "@/lib/game/home-state";
+import { formatRoundDate } from "@/lib/game/labels";
 import { renderPromptText } from "@/lib/game/prompts";
 import { SHARDS_PER_VESSEL, VESSEL_NAMES } from "@/lib/game/vessel-shapes";
 import { localParts } from "@/lib/time";
@@ -49,6 +52,7 @@ async function CourtyardContent() {
     memberIds: paired ? memberIds(viewer) : null,
     now,
   });
+  const lastMended = paired ? await getLastMendedMoment(db, viewer.home.id, state.round?.roundId ?? null) : null;
 
   return (
     <div className="rise-in">
@@ -69,17 +73,27 @@ async function CourtyardContent() {
         shelfCount={state.shelfCount}
         tree={state.tree}
         candlesLit={state.candlesLit}
+        attention={state.status === "your-turn" || state.status === "partner-answered"}
+        mendedRoundId={state.status === "mended" && state.round ? state.round.roundId : null}
       />
 
       <div className="mt-4">
         <MomentCard viewer={viewer} state={state} />
       </div>
 
+      {lastMended && isPaired(viewer) ? (
+        <LastMendedStrip
+          moment={lastMended}
+          names={{ partner: viewer.partner.displayName, daughter: viewer.home.daughterName }}
+        />
+      ) : null}
+
       {state.vessel ? (
-        <p className="mt-4 text-center text-[14px] text-ink-faint">
-          {VESSEL_NAMES[state.vessel.shape]} {state.vessel.position + 1} · {state.vessel.mended} of {SHARDS_PER_VESSEL}{" "}
-          pieces mended
-        </p>
+        <PieceTracker
+          mended={state.vessel.mended}
+          label={`${VESSEL_NAMES[state.vessel.shape]} ${state.vessel.position + 1} · ${state.vessel.mended} of ${SHARDS_PER_VESSEL} pieces mended`}
+          className="mt-5"
+        />
       ) : null}
     </div>
   );
@@ -152,7 +166,44 @@ function MomentCard({ viewer, state }: { viewer: HomeViewer; state: HomeState })
           <ButtonLink href="/moment" variant="secondary" className="mt-4 w-full">
             See what you both said
           </ButtonLink>
+          <Link
+            href="/moments"
+            className="mt-3 inline-block font-semibold text-primary underline-offset-4 hover:underline"
+          >
+            Look back at every moment
+          </Link>
         </Card>
       );
   }
+}
+
+/** A quiet pointer to the last thing you both said, so yesterday is never more than a tap away. */
+function LastMendedStrip({
+  moment,
+  names,
+}: {
+  moment: LastMended;
+  names: { partner: string; daughter: string | null };
+}) {
+  return (
+    <Link
+      href={`/moments#round-${moment.roundId}`}
+      className="rise-in mt-3 flex items-center gap-3 rounded-3xl border border-line bg-surface/70 px-4 py-3 transition-colors [animation-delay:150ms] hover:bg-surface"
+      data-testid="last-mended"
+    >
+      <span className="grid size-9 shrink-0 place-items-center rounded-full bg-gold-soft text-gold" aria-hidden="true">
+        <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <path d="M12 7v5l3 2" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="12" cy="12" r="8.5" />
+        </svg>
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[12px] font-semibold tracking-[0.12em] text-ink-faint uppercase">
+          Last mended · {formatRoundDate(moment.localDate).replace(/^(\w+), /, "$1 ")}
+        </span>
+        <span className="block truncate text-[15px] text-ink">{renderPromptText(moment.prompt.text, names)}</span>
+      </span>
+      <span className="shrink-0 text-[14px] font-semibold text-primary">Look back</span>
+    </Link>
+  );
 }

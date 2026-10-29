@@ -145,6 +145,32 @@ test.describe.serial("two people, one vessel", () => {
     await expect(maya.getByTestId("album-grid").locator("li")).toHaveCount(1);
   });
 
+  test("every past moment can be found again in the journal", async () => {
+    await josh.goto("/");
+    await expect(josh.getByTestId("last-mended")).toContainText("Last mended");
+    await josh.getByRole("link", { name: "Moments" }).click();
+    await expect(josh).toHaveURL(/\/moments$/);
+    const journal = josh.getByTestId("moments-journal");
+    await expect(journal).toContainText("18 moments so far");
+    await expect(journal.getByText("Whole at last")).toBeVisible();
+    await expect(journal.getByText("Almost whole")).toBeVisible();
+    await screenshot(josh, "13-moments");
+
+    await josh.getByLabel("Search past moments").fill("whole at");
+    await expect(journal).toContainText("1 of 18 moments");
+    await expect(journal.getByText("Whole at last")).toBeVisible();
+    await expect(journal.getByText("SECRET-JOSH-ANSWER")).toHaveCount(0);
+    await josh.getByLabel("Search past moments").fill("");
+    await expect(journal).toContainText("18 moments so far");
+
+    // The home strip deep-links to the card for the last mended moment.
+    await josh.goto("/");
+    await josh.getByTestId("last-mended").click();
+    await expect(josh).toHaveURL(/\/moments#round-/);
+    const hash = new URL(josh.url()).hash.slice(1);
+    await expect(josh.locator(`#${hash}`)).toBeInViewport();
+  });
+
   test("little firsts grow fruit on her tree", async () => {
     await josh.goto("/tree");
     await expect(josh.getByRole("heading", { name: "Noa's tree" })).toBeVisible();
@@ -181,6 +207,7 @@ test.describe.serial("two people, one vessel", () => {
       for (const [path, name] of [
         ["/", "courtyard"],
         ["/moment", "moment"],
+        ["/moments", "moments"],
         ["/tree", "tree"],
         ["/album", "album"],
         ["/shelf", "shelf"],

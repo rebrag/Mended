@@ -83,30 +83,39 @@ export function PomegranateTree({ growth, fruit, seed, className, label }: Props
         </radialGradient>
       </defs>
 
-      <path d={tree.trunk} stroke="var(--wood-dark)" strokeWidth={tree.trunkWidth} fill="none" strokeLinecap="round" />
-      {tree.branches.map((b, i) => (
-        <path key={i} d={b.path} stroke="var(--wood-dark)" strokeWidth={b.width} fill="none" strokeLinecap="round" />
-      ))}
-      {tree.leaves.map((leaf, i) => (
-        <ellipse
-          key={i}
-          cx={leaf.x}
-          cy={leaf.y}
-          rx={leaf.size}
-          ry={leaf.size * 0.45}
-          transform={`rotate(${leaf.rotate} ${leaf.x} ${leaf.y})`}
-          fill={leaf.dark ? "var(--olive-dark)" : "var(--olive)"}
+      {/* The whole tree sways from the base of its trunk. */}
+      <g className="sway" style={{ transformOrigin: `${W / 2}px ${BASE_Y}px` }}>
+        <path
+          d={tree.trunk}
+          stroke="var(--wood-dark)"
+          strokeWidth={tree.trunkWidth}
+          fill="none"
+          strokeLinecap="round"
         />
-      ))}
-      {tree.fruitSpots.slice(0, shown).map((f, i) => (
-        <g key={i}>
-          <circle cx={f.x} cy={f.y} r={fruitSize} fill={`url(#fruit-${seed})`} />
-          <path
-            d={`M${f.x - fruitSize * 0.35},${f.y - fruitSize * 0.85} l${fruitSize * 0.18},${-fruitSize * 0.5} l${fruitSize * 0.17},${fruitSize * 0.3} l${fruitSize * 0.17},${-fruitSize * 0.3} l${fruitSize * 0.18},${fruitSize * 0.5}z`}
-            fill="var(--pomegranate)"
+        {tree.branches.map((b, i) => (
+          <path key={i} d={b.path} stroke="var(--wood-dark)" strokeWidth={b.width} fill="none" strokeLinecap="round" />
+        ))}
+        {tree.leaves.map((leaf, i) => (
+          <ellipse
+            key={i}
+            cx={leaf.x}
+            cy={leaf.y}
+            rx={leaf.size}
+            ry={leaf.size * 0.45}
+            transform={`rotate(${leaf.rotate} ${leaf.x} ${leaf.y})`}
+            fill={leaf.dark ? "var(--olive-dark)" : "var(--olive)"}
           />
-        </g>
-      ))}
+        ))}
+        {tree.fruitSpots.slice(0, shown).map((f, i) => (
+          <g key={i}>
+            <circle cx={f.x} cy={f.y} r={fruitSize} fill={`url(#fruit-${seed})`} />
+            <path
+              d={`M${f.x - fruitSize * 0.35},${f.y - fruitSize * 0.85} l${fruitSize * 0.18},${-fruitSize * 0.5} l${fruitSize * 0.17},${fruitSize * 0.3} l${fruitSize * 0.17},${-fruitSize * 0.3} l${fruitSize * 0.18},${fruitSize * 0.5}z`}
+              fill="var(--pomegranate)"
+            />
+          </g>
+        ))}
+      </g>
 
       {/* Planter */}
       <path d={`M${W / 2 - 30},${BASE_Y - 2} h60 l-6,${H - BASE_Y - 2} h-48z`} fill="var(--clay)" />

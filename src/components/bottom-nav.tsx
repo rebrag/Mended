@@ -46,11 +46,19 @@ const icons: Record<string, ReactNode> = {
       <circle cx="15.5" cy="9" r="1.5" />
     </svg>
   ),
+  moments: (
+    <svg {...iconProps}>
+      <path d="M5 4.5h10.5a2 2 0 0 1 2 2V20H6.5A1.5 1.5 0 0 1 5 18.5z" />
+      <path d="M5 18.5A1.5 1.5 0 0 1 6.5 17h11" />
+      <path d="M8.5 8.5h6M8.5 12h4" />
+    </svg>
+  ),
 };
 
 const TABS = [
   { href: "/", label: "Home", icon: "home" },
   { href: "/moment", label: "Today", icon: "moment" },
+  { href: "/moments", label: "Moments", icon: "moments" },
   { href: "/tree", label: "Tree", icon: "tree" },
   { href: "/album", label: "Album", icon: "album" },
 ] as const;
@@ -64,7 +72,9 @@ export function BottomNav() {
     >
       <ul className="mx-auto flex max-w-lg">
         {TABS.map((tab) => {
-          const active = tab.href === "/" ? pathname === "/" : pathname.startsWith(tab.href);
+          // "/moment" and "/moments" are different tabs, so match whole path segments.
+          const active =
+            tab.href === "/" ? pathname === "/" : pathname === tab.href || pathname.startsWith(`${tab.href}/`);
           return (
             <li key={tab.href} className="flex-1">
               <Link

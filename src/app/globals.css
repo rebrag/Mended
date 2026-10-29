@@ -246,11 +246,97 @@ body {
   border-radius: 12px;
 }
 
+/* Clouds crossing the courtyard window. Distances are in scene units. */
+@keyframes cloud-drift {
+  from {
+    transform: translateX(-150px);
+  }
+  to {
+    transform: translateX(150px);
+  }
+}
+
+.cloud {
+  animation: cloud-drift 70s linear infinite;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.twinkle {
+  animation: twinkle 3.2s ease-in-out infinite;
+}
+
+/* The pomegranate tree swaying in a light breeze. */
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-1deg);
+  }
+  50% {
+    transform: rotate(1deg);
+  }
+}
+
+.sway {
+  transform-box: view-box;
+  animation: sway 5.5s ease-in-out infinite;
+}
+
+/* A warm pool of light on the plinth when today's moment is waiting. */
+@keyframes plinth-glow {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.04);
+  }
+}
+
+.plinth-glow {
+  animation: plinth-glow 2.6s ease-in-out infinite;
+}
+
+/* The newest piece on the tracker popping into gold. */
+@keyframes piece-pop {
+  0% {
+    transform: rotate(45deg) scale(0.2);
+    opacity: 0;
+  }
+  60% {
+    transform: rotate(45deg) scale(1.5);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(45deg) scale(1);
+    opacity: 1;
+  }
+}
+
+.piece-pop {
+  animation: piece-pop 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .flame,
   .glow-breathe,
   .rise-in,
-  .skeleton {
+  .skeleton,
+  .cloud,
+  .twinkle,
+  .sway,
+  .plinth-glow,
+  .piece-pop {
     animation: none;
   }
 }

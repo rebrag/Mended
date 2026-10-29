@@ -2,8 +2,9 @@ import { and, desc, eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { AnswerBody, MatchLine } from "@/components/answers";
+import Link from "next/link";
 import { VesselArt } from "@/components/art/vessel-art";
+import { MomentCard } from "@/components/moment-card";
 import { BackLink } from "@/components/page-header";
 import { Photo } from "@/components/photo";
 import { PhotoUploader } from "@/components/photo-uploader";
@@ -12,7 +13,6 @@ import { db, schema } from "@/db";
 import { requireHome } from "@/lib/dal";
 import { getVesselMoments } from "@/lib/game/history";
 import { formatRoundDate } from "@/lib/game/labels";
-import { renderPromptText } from "@/lib/game/prompts";
 import { SCENE_FRAME, SHARDS_PER_VESSEL, VESSEL_NAMES, type VesselShape } from "@/lib/game/vessel-shapes";
 import { PhotoPicker } from "./photo-picker";
 
@@ -54,7 +54,11 @@ async function VesselContent({ params }: { params: PageProps<"/shelf/[vesselId]"
   const moments = await getVesselMoments(db, viewer.home.id, vessel.id);
   const whole = Boolean(vessel.completedAt);
   const partner = viewer.partner;
-  const names = { me: viewer.user.displayName ?? "You", partner: partner?.displayName ?? "Your person" };
+  const names = {
+    me: viewer.user.displayName ?? "You",
+    partner: partner?.displayName ?? "Your person",
+    daughter: viewer.home.daughterName,
+  };
 
   const albumPhotos = whole
     ? await db
@@ -114,47 +118,29 @@ async function VesselContent({ params }: { params: PageProps<"/shelf/[vesselId]"
         <h2 className="font-serif text-[22px] font-medium text-ink">
           {moments.length === 0 ? "No moments yet" : "The moments inside"}
         </h2>
+        {moments.length > 0 ? (
+          <p className="mt-1 text-[15px] text-ink-soft">
+            Newest at the bottom.{" "}
+            <Link href="/moments" className="font-semibold text-primary underline-offset-4 hover:underline">
+              See every moment
+            </Link>
+          </p>
+        ) : null}
         {moments.length === 0 ? (
           <p className="mt-1.5 text-ink-soft">Each moment you both answer mends a piece and lands here.</p>
         ) : (
           <ol className="mt-3 space-y-3" data-testid="vessel-moments">
-            {moments.map((m) => {
-              const mine = m.answers[viewer.user.id] ?? null;
-              const theirs = partner ? (m.answers[partner.id] ?? null) : null;
-              return (
-                <li key={m.roundId}>
-                  <Card>
-                    <p className="text-[13px] font-semibold tracking-[0.12em] text-gold uppercase">
-                      Piece {m.shardIndex + 1} · {formatRoundDate(m.localDate)}
-                    </p>
-                    <p className="mt-1.5 font-serif text-[20px] leading-snug text-ink">
-                      {renderPromptText(m.prompt.text, {
-                        partner: names.partner,
-                        daughter: viewer.home.daughterName,
-                      })}
-                    </p>
-                    <div className="mt-3">
-                      <MatchLine prompt={m.prompt} mine={mine} theirs={theirs} names={names} />
-                    </div>
-                    <dl className="mt-3 space-y-3 border-t border-line pt-3">
-                      {[
-                        { who: names.me, answer: mine, self: true },
-                        { who: names.partner, answer: theirs, self: false },
-                      ].map(({ who, answer, self }) => (
-                        <div key={who + String(self)}>
-                          <dt className="text-[13px] font-semibold tracking-[0.12em] text-ink-faint uppercase">
-                            {who}
-                          </dt>
-                          <dd className="mt-1">
-                            {answer ? <AnswerBody answer={answer} prompt={m.prompt} self={self} names={names} /> : null}
-                          </dd>
-                        </div>
-                      ))}
-                    </dl>
-                  </Card>
-                </li>
-              );
-            })}
+            {moments.map((m, i) => (
+              <li key={m.roundId} className="rise-in" style={{ animationDelay: `${Math.min(i, 8) * 60}ms` }}>
+                <MomentCard
+                  id={`round-${m.roundId}`}
+                  moment={m}
+                  names={names}
+                  viewerId={viewer.user.id}
+                  partnerId={partner?.id ?? null}
+                />
+              </li>
+            ))}
           </ol>
         )}
       </section>

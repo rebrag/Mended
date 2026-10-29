@@ -6,7 +6,6 @@ import { BackLink, PageHeader } from "@/components/page-header";
 import { db } from "@/db";
 import { requireHome } from "@/lib/dal";
 import { getVessels } from "@/lib/game/history";
-import { countMended } from "@/lib/game/rounds";
 import { SHARDS_PER_VESSEL, VESSEL_NAMES, type VesselShape } from "@/lib/game/vessel-shapes";
 
 export const metadata: Metadata = { title: "The shelf" };
@@ -15,7 +14,18 @@ export default function ShelfPage() {
   return (
     <div>
       <BackLink href="/" label="Courtyard" />
-      <PageHeader eyebrow="Everything you've mended" title="The shelf" />
+      <PageHeader
+        eyebrow="Everything you've mended"
+        title="The shelf"
+        action={
+          <Link
+            href="/moments"
+            className="mt-1 shrink-0 rounded-full border border-line-strong px-3.5 py-2 text-[14px] font-semibold text-ink transition-colors hover:bg-surface-raised"
+          >
+            All moments
+          </Link>
+        }
+      />
       <Suspense
         fallback={
           <div className="grid grid-cols-2 gap-3" aria-busy="true">
@@ -43,23 +53,22 @@ async function ShelfContent() {
       </div>
     );
   }
-  const counts = await Promise.all(vessels.map(({ vessel }) => countMended(db, vessel.id)));
-
   return (
     <ul className="grid grid-cols-2 gap-3" data-testid="shelf">
-      {vessels.map(({ vessel }, i) => {
+      {vessels.map(({ vessel, mended }, i) => {
         const shape = vessel.shape as VesselShape;
         const whole = Boolean(vessel.completedAt);
         return (
           <li key={vessel.id}>
             <Link
               href={`/shelf/${vessel.id}`}
-              className="block rounded-3xl border border-line bg-surface p-3 shadow-card transition-transform active:scale-[0.98]"
+              className="rise-in block rounded-3xl border border-line bg-surface p-3 shadow-card transition-transform active:scale-[0.98]"
+              style={{ animationDelay: `${Math.min(i, 8) * 60}ms` }}
             >
               <VesselArt
                 shape={shape}
                 seed={vessel.id}
-                mended={counts[i]}
+                mended={mended}
                 className="mx-auto aspect-square w-full"
                 compact
               />
@@ -67,7 +76,7 @@ async function ShelfContent() {
                 {VESSEL_NAMES[shape]} {vessel.position + 1}
               </p>
               <p className="text-center text-[14px] text-ink-faint">
-                {whole ? "Whole" : `${counts[i]} of ${SHARDS_PER_VESSEL} mended`}
+                {whole ? "Whole" : `${mended} of ${SHARDS_PER_VESSEL} mended`}
               </p>
             </Link>
           </li>

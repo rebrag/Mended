@@ -32,6 +32,30 @@ const BLOCKS = wallBlocks();
 const WINDOW = { x: 128, y: 34, w: 104, h: 142 };
 const DOOR = { x: 16, y: 166, w: 70, h: 170 };
 
+/** Two soft clouds that drift across the window; they start off-screen and loop. */
+const CLOUDS: { y: number; duration: number; delay: number; puffs: [number, number, number, number][] }[] = [
+  {
+    y: 44,
+    duration: 74,
+    delay: -30,
+    puffs: [
+      [0, 0, 16, 7],
+      [-11, 3, 10, 5],
+      [12, 3, 11, 5.5],
+    ],
+  },
+  {
+    y: 76,
+    duration: 92,
+    delay: -70,
+    puffs: [
+      [0, 0, 12, 5.5],
+      [-9, 2.5, 8, 4],
+      [9, 2.5, 8, 4.2],
+    ],
+  },
+];
+
 function archPath(x: number, y: number, w: number, h: number): string {
   const r = w / 2;
   return `M${x},${y + h} V${y + r} A${r},${r} 0 0 1 ${x + w},${y + r} V${y + h} Z`;
@@ -104,8 +128,31 @@ export function CourtyardBackdrop({ period, className }: { period: DayPeriod; cl
       <g clipPath="url(#window-clip)">
         <rect x={WINDOW.x} y={WINDOW.y} width={WINDOW.w} height={WINDOW.h} fill="url(#sky)" />
         {stars.map((s, i) => (
-          <circle key={i} cx={s.x} cy={s.y} r={s.s} fill="#fff" opacity="0.85" />
+          <circle
+            key={i}
+            cx={s.x}
+            cy={s.y}
+            r={s.s}
+            fill="#fff"
+            className="twinkle"
+            style={{ animationDelay: `${-((i * 7) % 11) * 0.4}s`, animationDuration: `${2.6 + (i % 4) * 0.5}s` }}
+          />
         ))}
+        {!night
+          ? CLOUDS.map((cloud, i) => (
+              <g
+                key={i}
+                className="cloud"
+                style={{ animationDuration: `${cloud.duration}s`, animationDelay: `${cloud.delay}s` }}
+                fill={period === "dusk" ? "#ffe3cf" : "#ffffff"}
+                opacity={period === "dusk" ? 0.55 : 0.72}
+              >
+                {cloud.puffs.map(([dx, dy, rx, ry], j) => (
+                  <ellipse key={j} cx={WINDOW.x + WINDOW.w / 2 + dx} cy={WINDOW.y + cloud.y + dy} rx={rx} ry={ry} />
+                ))}
+              </g>
+            ))
+          : null}
         {night ? (
           <path d={`M${WINDOW.x + 74},${WINDOW.y + 26} a12,12 0 1,0 10,18 a9.5,9.5 0 1,1 -10,-18z`} fill="#f6efd8" />
         ) : period === "day" ? (

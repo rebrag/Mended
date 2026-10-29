@@ -162,13 +162,30 @@ export function VesselArt({
           const rest = { x: 0, y: 0, rotate: 0 };
           const path = pointsToPath(shard.points);
           const isAnimating = animating && i === justMended;
+          // Loose pieces bob gently while they wait; small vessels on the shelf stay still.
+          const bob = !isMended && !compact && !reduceMotion;
           return (
             <motion.g
               key={i}
               style={{ transformBox: "fill-box", transformOrigin: "center" }}
               initial={isAnimating ? loose : isMended ? rest : loose}
-              animate={isMended ? rest : loose}
-              transition={isAnimating ? { type: "spring", stiffness: 70, damping: 14, delay: 0.25 } : { duration: 0 }}
+              animate={isMended ? rest : bob ? { ...loose, y: [loose.y - 1.6, loose.y + 1.6] } : loose}
+              transition={
+                isAnimating
+                  ? { type: "spring", stiffness: 70, damping: 14, delay: 0.25 }
+                  : bob
+                    ? {
+                        duration: 0,
+                        y: {
+                          duration: 2.6 + (i % 5) * 0.35,
+                          repeat: Infinity,
+                          repeatType: "mirror",
+                          ease: "easeInOut",
+                          delay: -((i * 0.7) % 2.4),
+                        },
+                      }
+                    : { duration: 0 }
+              }
               opacity={isMended ? 1 : 0.82}
             >
               <path d={path} fill={`url(#${id("clay")})`} />
@@ -179,6 +196,11 @@ export function VesselArt({
           );
         })}
       </g>
+
+      {/* A little burst of gold where the piece landed. */}
+      {animating && justMended !== null && shards[justMended] ? (
+        <Sparkles origin={shards[justMended].centroid} big={whole} />
+      ) : null}
 
       {/* Gold in the cracks of mended pieces. */}
       <g fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -216,5 +238,35 @@ export function VesselArt({
         )}
       </g>
     </svg>
+  );
+}
+
+function Sparkles({ origin: [cx, cy], big }: { origin: [number, number]; big: boolean }) {
+  const count = big ? 18 : 9;
+  const reach = big ? 70 : 34;
+  return (
+    <g aria-hidden="true">
+      {Array.from({ length: count }, (_, i) => {
+        const angle = (i / count) * Math.PI * 2 + (i % 2) * 0.3;
+        const distance = reach * (0.7 + ((i * 37) % 10) / 30);
+        return (
+          <motion.circle
+            key={i}
+            cx={cx}
+            cy={cy}
+            r={big ? 2.6 : 2}
+            fill={i % 3 === 0 ? "var(--gold)" : "var(--gold-bright)"}
+            initial={{ x: 0, y: 0, opacity: 0, scale: 0.3 }}
+            animate={{
+              x: Math.cos(angle) * distance,
+              y: Math.sin(angle) * distance - 6,
+              opacity: [0, 1, 1, 0],
+              scale: [0.3, 1.1, 0.9, 0.2],
+            }}
+            transition={{ duration: big ? 1.4 : 1, delay: 1.05 + (i % 4) * 0.05, ease: "easeOut" }}
+          />
+        );
+      })}
+    </g>
   );
 }

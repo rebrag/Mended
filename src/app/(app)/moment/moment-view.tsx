@@ -8,6 +8,8 @@ import { VesselArt } from "@/components/art/vessel-art";
 import { Button, ButtonLink, Card, FormError, Textarea, cx } from "@/components/ui";
 import { AnswerBody, MatchLine } from "@/components/answers";
 import { MAX_ANSWER_LENGTH, type Answer } from "@/lib/game/answers";
+import { PieceTracker } from "@/components/piece-tracker";
+import { markSeen, readSeen } from "@/lib/seen";
 import type { Prompt } from "@/lib/game/prompts";
 import type { RoundView } from "@/lib/game/rounds";
 import { SCENE_FRAME, SHARDS_PER_VESSEL, VESSEL_NAMES, type VesselShape } from "@/lib/game/vessel-shapes";
@@ -15,24 +17,7 @@ import { SCENE_FRAME, SHARDS_PER_VESSEL, VESSEL_NAMES, type VesselShape } from "
 type Names = { me: string; partner: string; daughter: string | null };
 type VesselInfo = { id: string; shape: VesselShape; mended: number; position: number };
 
-const SEEN_PREFIX = "mended:seen:";
 const noopSubscribe = () => () => {};
-
-function readSeen(roundId: string): boolean {
-  try {
-    return localStorage.getItem(SEEN_PREFIX + roundId) === "1";
-  } catch {
-    return true;
-  }
-}
-
-function markSeen(roundId: string) {
-  try {
-    localStorage.setItem(SEEN_PREFIX + roundId, "1");
-  } catch {
-    // Storage unavailable; the animation simply plays again next time.
-  }
-}
 
 export function MomentView({
   view,
@@ -83,12 +68,15 @@ export function MomentView({
 
 function VesselProgress({ vessel }: { vessel: VesselInfo }) {
   return (
-    <div className="flex items-center gap-4 rounded-3xl border border-line bg-surface px-4 py-3">
-      <VesselArt shape={vessel.shape} seed={vessel.id} mended={vessel.mended} className="size-16 shrink-0" compact />
-      <p className="text-[15px] text-ink-soft">
-        When you both answer, piece {Math.min(vessel.mended + 1, SHARDS_PER_VESSEL)} of {SHARDS_PER_VESSEL} of your{" "}
-        {VESSEL_NAMES[vessel.shape].toLowerCase()} is mended.
-      </p>
+    <div className="rounded-3xl border border-line bg-surface px-4 py-3">
+      <div className="flex items-center gap-4">
+        <VesselArt shape={vessel.shape} seed={vessel.id} mended={vessel.mended} className="size-16 shrink-0" compact />
+        <p className="text-[15px] text-ink-soft">
+          When you both answer, piece {Math.min(vessel.mended + 1, SHARDS_PER_VESSEL)} of {SHARDS_PER_VESSEL} of your{" "}
+          {VESSEL_NAMES[vessel.shape].toLowerCase()} is mended.
+        </p>
+      </div>
+      <PieceTracker mended={vessel.mended} className="mt-3" />
     </div>
   );
 }
@@ -404,6 +392,7 @@ function Reveal({ view, names, vessel }: { view: RoundView; names: Names; vessel
           ? `The ${VESSEL_NAMES[vessel.shape].toLowerCase()} is whole`
           : `Piece ${mendedAfter} of ${SHARDS_PER_VESSEL} mended`}
       </p>
+      <PieceTracker mended={mendedAfter} pop={justMended !== null} className="-mt-1" />
 
       <MatchLine prompt={view.prompt} mine={view.myAnswer} theirs={view.partnerAnswer} names={names} />
 
@@ -423,12 +412,12 @@ function Reveal({ view, names, vessel }: { view: RoundView; names: Names; vessel
       ) : (
         <p className="text-center text-[15px] text-ink-faint">A new moment opens tomorrow.</p>
       )}
-      <p className="text-center">
-        <Link
-          href={`/shelf/${vessel.id}`}
-          className="text-[15px] font-semibold text-primary underline-offset-4 hover:underline"
-        >
-          Look back at this {VESSEL_NAMES[vessel.shape].toLowerCase()}&apos;s moments
+      <p className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-center text-[15px]">
+        <Link href={`/shelf/${vessel.id}`} className="font-semibold text-primary underline-offset-4 hover:underline">
+          This {VESSEL_NAMES[vessel.shape].toLowerCase()}&apos;s moments
+        </Link>
+        <Link href="/moments" className="font-semibold text-primary underline-offset-4 hover:underline">
+          Every past moment
         </Link>
       </p>
     </div>

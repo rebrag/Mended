@@ -119,7 +119,7 @@ To send from your own domain instead of Gmail, set `MAIL_TRANSPORT=resend` with 
 
 - `src/lib/game/` holds the game rules: prompt deck, prompt selection, rounds, answers, and vessel geometry.
 - `src/components/art/` holds the hand-built SVG art: vessel, courtyard, tree, candles.
-- `src/app/(app)/` holds the signed-in screens: courtyard, today's moment, tree, album, shelf, settings.
+- `src/app/(app)/` holds the signed-in screens: courtyard, today's moment, the moments journal, tree, album, shelf, settings.
 - `src/lib/dal.ts` is the data access layer; every page, action and route checks the session and home membership there.
 - `drizzle/` holds the SQL migrations, generated with `npm run db:generate` after editing `src/db/schema.ts`.
 

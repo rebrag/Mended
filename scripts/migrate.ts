@@ -1,4 +1,7 @@
-import "dotenv/config";
+import { config } from "dotenv";
+
+// Next.js reads .env.local on its own; this script runs outside Next, so load it the same way.
+config({ path: [".env.local", ".env"], quiet: true });
 import { createDb } from "../src/db";
 import { runMigrations } from "../src/db/migrate";
 

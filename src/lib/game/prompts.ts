@@ -9,7 +9,15 @@ export type TextKind = "question" | "memory" | "dream" | "about_her" | "gratitud
 export type Prompt =
   | { id: string; kind: TextKind; text: string }
   | { id: string; kind: "this_or_that"; text: string; options: [string, string] }
-  | { id: string; kind: "guess_partner"; text: string; options: string[] }
+  | {
+      id: string;
+      kind: "guess_partner";
+      /** Asked of each member about themselves; shown as the headline. */
+      text: string;
+      /** The same question about the partner, asked when guessing their answer. */
+      guessText: string;
+      options: string[];
+    }
   | {
       id: string;
       kind: "split_clue";
@@ -34,10 +42,11 @@ const tot = (id: string, a: string, b: string, text = "Which one?"): Prompt => (
   text,
   options: [a, b],
 });
-const guess = (id: string, text: string, options: string[]): Prompt => ({
+const guess = (id: string, text: string, guessText: string, options: string[]): Prompt => ({
   id,
   kind: "guess_partner",
   text,
+  guessText,
   options,
 });
 
@@ -172,51 +181,91 @@ export const PROMPTS: Prompt[] = [
   tot("t-past-future", "Visit the past for a day", "Visit the future for a day"),
 
   // Guess your partner
-  guess("p-morning-drink", "What does {partner} reach for first in the morning?", ["Coffee", "Tea", "Water", "Phone"]),
-  guess("p-free-evening", "Free evening, no responsibilities. What does {partner} pick?", [
-    "Sleep",
-    "A show",
-    "Go out",
-    "A hobby",
-  ]),
-  guess("p-vacation", "{partner}'s ideal vacation?", [
+  guess(
+    "p-morning-drink",
+    "What do you reach for first in the morning?",
+    "What does {partner} reach for first in the morning?",
+    ["Coffee", "Tea", "Water", "Phone"],
+  ),
+  guess(
+    "p-free-evening",
+    "Free evening, no responsibilities. What do you pick?",
+    "Free evening, no responsibilities. What does {partner} pick?",
+    ["Sleep", "A show", "Go out", "A hobby"],
+  ),
+  guess("p-vacation", "What's your ideal vacation?", "What's {partner}'s ideal vacation?", [
     "Beach and books",
     "Exploring a city",
     "Nature and hiking",
     "Staying home",
   ]),
-  guess("p-snack", "{partner}'s go-to snack?", ["Chips", "Chocolate", "Fruit", "Cheese"]),
-  guess("p-superpower", "Which superpower would {partner} pick?", [
+  guess("p-snack", "What's your go-to snack?", "What's {partner}'s go-to snack?", [
+    "Chips",
+    "Chocolate",
+    "Fruit",
+    "Cheese",
+  ]),
+  guess("p-superpower", "Which superpower would you pick?", "Which superpower would {partner} pick?", [
     "Flying",
     "Teleporting",
     "Pausing time",
     "Reading minds",
   ]),
-  guess("p-chore", "Which chore does {partner} mind least?", ["Dishes", "Laundry", "Cooking", "Vacuuming"]),
-  guess("p-season", "{partner}'s favorite season?", ["Spring", "Summer", "Fall", "Winter"]),
-  guess("p-movie-genre", "Movie night. What genre does {partner} want?", ["Comedy", "Romance", "Thriller", "Animated"]),
-  guess("p-love-language", "What makes {partner} feel most cared for?", [
+  guess("p-chore", "Which chore do you mind least?", "Which chore does {partner} mind least?", [
+    "Dishes",
+    "Laundry",
+    "Cooking",
+    "Vacuuming",
+  ]),
+  guess("p-season", "What's your favorite season?", "What's {partner}'s favorite season?", [
+    "Spring",
+    "Summer",
+    "Fall",
+    "Winter",
+  ]),
+  guess("p-movie-genre", "Movie night. What genre do you want?", "Movie night. What genre does {partner} want?", [
+    "Comedy",
+    "Romance",
+    "Thriller",
+    "Animated",
+  ]),
+  guess("p-love-language", "What makes you feel most cared for?", "What makes {partner} feel most cared for?", [
     "Kind words",
     "Help with things",
     "Time together",
     "A hug",
   ]),
-  guess("p-recharge", "How does {partner} recharge best?", ["Alone time", "With friends", "Outside", "Sleeping in"]),
-  guess("p-daughter-moment", "{partner}'s favorite part of the day with {daughter}?", [
-    "Morning cuddles",
-    "Bath time",
-    "Playtime",
-    "Bedtime",
+  guess("p-recharge", "How do you recharge best?", "How does {partner} recharge best?", [
+    "Alone time",
+    "With friends",
+    "Outside",
+    "Sleeping in",
   ]),
-  guess("p-dessert", "{partner} gets one dessert. Which?", ["Ice cream", "Cake", "Cookies", "Something fruity"]),
-  guess("p-cuisine", "Which cuisine would {partner} eat every week?", [
+  guess(
+    "p-daughter-moment",
+    "What's your favorite part of the day with {daughter}?",
+    "What's {partner}'s favorite part of the day with {daughter}?",
+    ["Morning cuddles", "Bath time", "Playtime", "Bedtime"],
+  ),
+  guess("p-dessert", "You get one dessert. Which?", "{partner} gets one dessert. Which?", [
+    "Ice cream",
+    "Cake",
+    "Cookies",
+    "Something fruity",
+  ]),
+  guess("p-cuisine", "Which cuisine would you eat every week?", "Which cuisine would {partner} eat every week?", [
     "Italian",
     "Mexican",
     "Asian",
     "Middle Eastern",
   ]),
-  guess("p-breakfast", "{partner}'s ideal breakfast?", ["Eggs", "Pastry", "Shakshuka", "Just coffee"]),
-  guess("p-music", "Long drive. What does {partner} put on?", [
+  guess("p-breakfast", "What's your ideal breakfast?", "What's {partner}'s ideal breakfast?", [
+    "Eggs",
+    "Pastry",
+    "Shakshuka",
+    "Just coffee",
+  ]),
+  guess("p-music", "Long drive. What do you put on?", "Long drive. What does {partner} put on?", [
     "Old favorites",
     "Something new",
     "A podcast",

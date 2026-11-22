@@ -16,6 +16,14 @@ describe("prompt deck", () => {
       if (p.kind === "split_clue") expect(p.accept.length).toBeGreaterThan(0);
     }
   });
+
+  it("asks guess prompts of yourself first, then about your partner", () => {
+    for (const p of PROMPTS) {
+      if (p.kind !== "guess_partner") continue;
+      expect(p.text, p.id).not.toContain("{partner}");
+      expect(p.guessText, p.id).toContain("{partner}");
+    }
+  });
 });
 
 describe("selectPrompt", () => {

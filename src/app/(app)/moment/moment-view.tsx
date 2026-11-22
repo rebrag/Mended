@@ -10,7 +10,7 @@ import { AnswerBody, MatchLine } from "@/components/answers";
 import { MAX_ANSWER_LENGTH, type Answer } from "@/lib/game/answers";
 import { PieceTracker } from "@/components/piece-tracker";
 import { markSeen, readSeen } from "@/lib/seen";
-import type { Prompt } from "@/lib/game/prompts";
+import { renderPromptText, type Prompt } from "@/lib/game/prompts";
 import type { RoundView } from "@/lib/game/rounds";
 import { SCENE_FRAME, SHARDS_PER_VESSEL, VESSEL_NAMES, type VesselShape } from "@/lib/game/vessel-shapes";
 
@@ -114,7 +114,7 @@ function AnswerForm({
       {prompt.kind === "this_or_that" ? (
         <ThisOrThatFields prompt={prompt} initial={initial} />
       ) : prompt.kind === "guess_partner" ? (
-        <GuessFields prompt={prompt} initial={initial} partner={names.partner} />
+        <GuessFields prompt={prompt} initial={initial} partner={names.partner} daughter={names.daughter} />
       ) : prompt.kind === "split_clue" ? (
         <ClueFields prompt={prompt} seat={view.seat} partner={names.partner} initial={initial} />
       ) : (
@@ -225,17 +225,24 @@ function GuessFields({
   prompt,
   initial,
   partner,
+  daughter,
 }: {
   prompt: Extract<Prompt, { kind: "guess_partner" }>;
   initial: Answer | null;
   partner: string;
+  daughter: string | null;
 }) {
   const choice = initial && "choice" in initial ? initial.choice : null;
   const guess = initial && "guess" in initial ? initial.guess : null;
   return (
     <>
       <fieldset className="space-y-2.5">
-        <legend className="mb-2.5 text-[15px] font-semibold text-ink">Your own answer</legend>
+        <legend className="mb-2.5">
+          <span className="block text-[13px] font-semibold tracking-[0.12em] text-gold uppercase">1 · Your answer</span>
+          <span className="mt-1 block text-[17px] text-ink">
+            {renderPromptText(prompt.text, { partner, daughter })}
+          </span>
+        </legend>
         <div className="grid grid-cols-2 gap-2.5">
           {prompt.options.map((option, i) => (
             <OptionCard key={option} name="choice" value={i} label={option} defaultChecked={choice === i} />
@@ -243,7 +250,14 @@ function GuessFields({
         </div>
       </fieldset>
       <fieldset className="space-y-2.5">
-        <legend className="mb-2.5 text-[15px] font-semibold text-ink">Your guess for {partner}</legend>
+        <legend className="mb-2.5">
+          <span className="block text-[13px] font-semibold tracking-[0.12em] text-gold uppercase">
+            2 · Your guess for {partner}
+          </span>
+          <span className="mt-1 block text-[17px] text-ink">
+            {renderPromptText(prompt.guessText, { partner, daughter })}
+          </span>
+        </legend>
         <div className="grid grid-cols-2 gap-2.5">
           {prompt.options.map((option, i) => (
             <OptionCard key={option} name="guess" value={i} label={option} defaultChecked={guess === i} />
